@@ -7,20 +7,32 @@ import org.json.simple.parser.JSONParser;
 
 
 public class Parser {
-    public static void main(String[] args) throws Exception {
-        URL oracle = new URL("http://api.openweathermap.org/data/2.5/" +
-                "weather?q=Lviv&APPID=5496614f4ca95e6dcc0445c1e7f3916d");
+    private String url;
+    public Parser(String city){
+        url = "http://api.openweathermap.org/data/2.5/weather?q=" +
+                city + "&APPID=5496614f4ca95e6dcc0445c1e7f3916d";
+    }
+
+    //public static void main(String[] args) throws Exception {
+    public JSONObject parse() throws Exception {
+        URL oracle = new URL(url);
         BufferedReader in = new BufferedReader(
                 new InputStreamReader(oracle.openStream()));
         JSONParser parser = new JSONParser();
         Object obj = parser.parse(in);
         JSONObject jsonObject = (JSONObject) obj;
-        System.out.println(jsonObject);
-        String weather = (String) (((JSONObject) ((JSONArray) jsonObject.get("weather")).get(0)).get("description"));
-        double kel = (Double) ((JSONObject) jsonObject.get("main")).get("temp");
-        double cel = kel - 273.15;
-        System.out.println(weather);
-        System.out.println(kel);
-        System.out.println(cel);
+        return jsonObject;
+    }
+
+    public String get_city_name(JSONObject jo){
+        return (String) jo.get("name");
+    }
+
+    public String get_weather(JSONObject jo){
+        return (String) (((JSONObject) ((JSONArray) jo.get("weather")).get(0)).get("description"));
+    }
+
+    public double get_temp(JSONObject jo, TempType tt){
+        return (Double) ((JSONObject) jo.get("main")).get("temp") - tt.toDouble();
     }
 }
